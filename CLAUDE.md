@@ -46,5 +46,7 @@ HTML / CSS / JS のみ。AWS S3 + CloudFront などの静的ホスティング�
 - **協働体制（譲渡完了・2026-06-10）**：リポジトリは **`OkazakiIT/okazaki-itc-site`（岡﨑さん所有）**。MetamoL は共同編集者(write)として再追加済み・push 実証済み。両者 `push` で保守可。
   - 公開URL：**https://okazakiit.github.io/okazaki-itc-site/**（Pages built・全アセット200・絶対URLも新URLに統一済み。旧 metamol URL は無効・リダイレクトなし）。
   - ローカル remote は `OkazakiIT/okazaki-itc-site` に切替済み。
-- 残タスク：**なし**。独自ドメイン・WebP化は「対応しない」のまま。
-- 保守フロー：ファイル編集 → `git commit` → `git push`（main）で本番反映。
+- **2026-07-14：デザイン全面刷新（クライアント承認済み）**。参考LP2本（歯科＝白・シンプル系／ジム＝黒・スタイリッシュ系）の *設計* のみ取り込み、素材は不使用（著作権）。明朝見出し＋広い字間／セクション見出し背後の英字ウォーターマーク／濃紺の帯セクション／サービスの 01-03 番号＋角括弧／全幅ヒーロー＋特長チップ／モバイル下部固定CTA／濃紺＋くすみグリーンの2色＋ヘアライン基調（影・角丸を削減）。本文の実データは無変更。
+- 残タスク：**Google Search Console 登録**（未実施。サイトは検索許可設定だが Google に未発見＝`site:` 検索で0件。手順書＝`SEARCH_CONSOLE.md`。岡﨑さんが確認コード取得 → 制作側が meta タグを `index.html` に追加 → sitemap 送信、の往復1回）。独自ドメイン・WebP化は「対応しない」のまま。
+- 保守フロー：ファイル編集 → ブラウザ実機で検証 → `git commit` → `git push`（main）で本番反映。
+- プレビュー：ワークスペース共通 `.claude/launch.json` の `business-card`（port 8123）。
