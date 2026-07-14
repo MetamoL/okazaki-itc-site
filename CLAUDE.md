@@ -42,11 +42,14 @@ HTML / CSS / JS のみ。AWS S3 + CloudFront などの静的ホスティング�
   - B: 数字ストリップ(30年以上/12年/2010年〜/2013年)／新聞カードの contain 全面表示／CTA文言＋mailto件名・本文プリセット
   - C: スキップリンク／モバイルメニューのフォーカス管理(閉時フォーカス不可化＋復帰)／`404.html`／印刷スタイル
   - D: JSON-LD(Person+Organization)／ヒーローLCP最適化(preload＋fetchpriority)。WebPは環境にエンコーダ無く見送り(壊れ参照なし)
-- **公開済み（GitHub Pages）**：**https://metamol.github.io/okazaki-itc-site/**（Public・`main`/root配信・`.nojekyll`・HTTPS強制。`git push`で自動再デプロイ）
-- **協働体制（譲渡完了・2026-06-10）**：リポジトリは **`OkazakiIT/okazaki-itc-site`（岡﨑さん所有）**。MetamoL は共同編集者(write)として再追加済み・push 実証済み。両者 `push` で保守可。
-  - 公開URL：**https://okazakiit.github.io/okazaki-itc-site/**（Pages built・全アセット200・絶対URLも新URLに統一済み。旧 metamol URL は無効・リダイレクトなし）。
-  - ローカル remote は `OkazakiIT/okazaki-itc-site` に切替済み。
+- **公開URL（正）**：**https://okazakiit.github.io/okazaki-itc-site/**（GitHub Pages・Public・`main`/root配信・`.nojekyll`・HTTPS強制。`git push`で自動再デプロイ）
+  - ⚠️ 旧URL `metamol.github.io/okazaki-itc-site/` は**譲渡で消滅済み（404・リダイレクトなし）**。ドキュメントやリンクに書かない。
+- **協働体制（譲渡完了・2026-06-10）**：リポジトリは **`OkazakiIT/okazaki-itc-site`（岡﨑さん所有）**。MetamoL は共同編集者(write)。両者 `push` で保守可。ローカル remote も切替済み。
+  - MetamoL の「Repositories」タブには**出ない**（所有者が別のため）。閲覧は上記URLか https://github.com/OkazakiIT/okazaki-itc-site から。
 - **2026-07-14：デザイン全面刷新（クライアント承認済み）**。参考LP2本（歯科＝白・シンプル系／ジム＝黒・スタイリッシュ系）の *設計* のみ取り込み、素材は不使用（著作権）。明朝見出し＋広い字間／セクション見出し背後の英字ウォーターマーク／濃紺の帯セクション／サービスの 01-03 番号＋角括弧／全幅ヒーロー＋特長チップ／モバイル下部固定CTA／濃紺＋くすみグリーンの2色＋ヘアライン基調（影・角丸を削減）。本文の実データは無変更。
-- 残タスク：**Google Search Console 登録**（未実施。サイトは検索許可設定だが Google に未発見＝`site:` 検索で0件。手順書＝`SEARCH_CONSOLE.md`。岡﨑さんが確認コード取得 → 制作側が meta タグを `index.html` に追加 → sitemap 送信、の往復1回）。独自ドメイン・WebP化は「対応しない」のまま。
+- **2026-07-14：名刺の入稿データ（PDF）を納品**。両面・55×91mm＋塗り足し3mm・文字はテキスト保持（アウトライン化なし）・サイトURLのQR入り。データ一式＝`client_source/meishi/`（`card-source.html` を直して再出力すれば微調整可）。
+- **2026-07-14：Google Search Console 登録完了**（所有権確認タグを `index.html` の head に設置 → sitemap 送信 → インデックス登録リクエストまで実施）。**確認タグは削除禁止**（所有権が外れる）。インデックス反映は数日〜数週間。確認は `site:okazakiit.github.io/okazaki-itc-site/` で検索。載らない場合の打ち手＝外部被リンク（LinkedIn／おかやま企業情報ナビ）。手順書＝`SEARCH_CONSOLE.md`
+- 残タスク：**なし**。独自ドメイン・WebP化は「対応しない」のまま。
 - 保守フロー：ファイル編集 → ブラウザ実機で検証 → `git commit` → `git push`（main）で本番反映。
 - プレビュー：ワークスペース共通 `.claude/launch.json` の `business-card`（port 8123）。
+- **個人情報ガード**：`client_source/`（顔写真の原本・職務経歴書・名刺PDF＝自宅住所/携帯番号）は `.gitignore` 済み。加えて `.git/hooks/pre-commit` で、`client_source/` 配下・秘密ファイル・携帯番号/郵便番号の混入をコミット時にブロック（**このPCローカルのみ。別PCでは要再設置**）。リポジトリは Public なので一度 push すると履歴から消せない。
