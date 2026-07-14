@@ -1,8 +1,17 @@
 /* ============================================================
-   共通スタイル  /  Sprint 0：基盤構築
+   岡﨑ＩＴコンサルティング株式会社 名刺サイト  共通スタイル
    構成: 1.リセット 2.デザイントークン 3.ベース 4.レイアウト土台
-         5.ヘッダー/ナビ枠 6.プレースホルダー表示
+         5.ヘッダー/ナビ 6.ヒーロー 7.共通見出し 8.各セクション
+         9.フッター 10.アニメ 11.印刷
    方針: モバイルファースト（まず狭い画面、@media (min-width) で拡張）
+
+   ■ デザイン方針（2026-07-14 改修）
+   参考にしたLPの「設計」だけを取り込み、素材は一切使わない：
+   - 明朝体＋広い字間の見出し（重厚・信頼感）／本文はゴシックで可読性維持
+   - セクション見出しの背後に巨大な英字ウォーターマーク
+   - サービスは 01/02/03 の番号＋角括弧
+   - 濃紺の帯セクションで縦のリズムを作る
+   - 影を減らし、ヘアラインと余白で構造を見せる
    ============================================================ */
 
 /* ---------- 1. 最小リセット ---------- */
@@ -47,22 +56,29 @@ button {
 }
 
 /* ---------- 2. デザイントークン（CSS変数） ----------
-   ブランドカラーやサイズの「一元管理」。
-   後でブランドカラーを変えるときは --color-accent の1行を直すだけで済む。 */
+   配色は「白／温かみのあるオフホワイト」をベースに、
+   濃紺（信頼）＋くすみグリーン（落ち着き）の2色だけで構成する。
+   文字色はすべて背景に対しコントラスト比 4.5:1 以上を確保。 */
 :root {
-  /* 配色：ベース(白/オフホワイト) + アクセント1色 + ダークグレー文字 */
   --color-bg: #ffffff;
-  --color-bg-subtle: #f7f7f5;   /* セクション背景の差し色（オフホワイト） */
-  --color-text: #2d2d2d;        /* 本文 */
-  --color-text-muted: #5b6573;  /* 補足テキスト（コントラスト比 4.5:1 以上を確保：hero #f3f7fb 上で約5.49、#f7f7f5 上で約5.51） */
-  --color-accent: #2b6cb0;      /* ★ブランドカラー（ここ1行で全体を変更可能） */
-  --color-accent-dark: #21527e; /* ホバー等の濃いめ */
-  --color-border: #e5e7eb;
+  --color-bg-subtle: #f6f5f2;   /* 温かみのあるオフホワイト */
+  --color-text: #24303c;        /* 本文（白背景で約12:1） */
+  --color-text-muted: #59646f;  /* 補足（白背景で約6.0:1／#f6f5f2 上で約5.7:1） */
 
-  /* タイポグラフィ（日本語対応のシステムフォント＝読み込み無しで軽量・高速） */
+  --color-accent: #1f3a52;      /* ★ブランドカラー＝濃紺（白背景で約10.6:1） */
+  --color-accent-dark: #16293a; /* ホバー等 */
+  --color-sage: #8fa2a3;        /* くすみグリーン＝装飾専用（文字色には使わない） */
+  --color-band: #1f3a52;        /* 帯セクションの地色（白文字で約10.6:1） */
+  --color-border: #e3e1dc;      /* ヘアライン（温かみのあるグレー） */
+
+  /* タイポグラフィ
+     見出し＝明朝（システム同梱のみ。Webフォント読込なし＝軽量・高速）
+     本文  ＝ゴシック（小さい文字は明朝だと読みにくいため） */
   --font-base: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
     "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  --line-height: 1.8;
+  --font-serif: "Yu Mincho", YuMincho, "Hiragino Mincho ProN", "Hiragino Mincho Pro",
+    "Noto Serif JP", "MS PMincho", "Times New Roman", serif;
+  --line-height: 1.9;
 
   /* 余白・サイズ（8pxグリッドベース） */
   --space-xs: 0.5rem;
@@ -75,8 +91,8 @@ button {
   --container-pad: 1.25rem;  /* 左右の余白（モバイル基準） */
   --header-height: 60px;
 
-  --radius: 10px;
-  --shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  --radius: 2px;             /* 角丸はほぼ廃止（直線基調の上品さ） */
+  --shadow: 0 10px 30px rgba(31, 58, 82, 0.07);
   --transition: 0.25s ease;
 }
 
@@ -88,6 +104,8 @@ body {
   background: var(--color-bg);
   /* ヘッダーが fixed のぶん、本文の先頭が隠れないように余白を確保 */
   padding-top: var(--header-height);
+  /* モバイルは画面下端に固定CTAバーが出るので、その分の余白を確保 */
+  padding-bottom: 72px;
 }
 
 /* アンカー移動時に固定ヘッダーへ潜り込まないよう、着地位置を調整 */
@@ -95,15 +113,19 @@ body {
   scroll-margin-top: var(--header-height);
 }
 
-/* 「ページ先頭へ戻る」の着地点。body 直下の不可視アンカー。
-   - サイズ0・装飾なしでレイアウトに一切影響させない。
-   - 上の :target ルールはヘッダー高さ分の余白を入れるが、#top は
-     ドキュメント最上部（y=0）へ戻したいので scroll-margin-top を 0 に上書きする。
-     これで #top アンカー／JS どちらでも確実に最上部へ着地する。 */
+/* 「ページ先頭へ戻る」の着地点。body 直下の不可視アンカー。 */
 #top {
   display: block;
   height: 0;
   scroll-margin-top: 0;
+}
+
+/* 見出しは明朝＋広めの字間で統一（LP参考：重厚さと余白の美しさ） */
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.65;
 }
 
 /* ---------- 4. レイアウト土台 ---------- */
@@ -114,30 +136,23 @@ body {
   padding-inline: var(--container-pad);
 }
 
-/* 各セクション共通の上下余白（ヒーローは個別指定するので .section のみ） */
+/* 各セクション共通の上下余白 */
 .section {
-  padding-block: var(--space-lg);
+  padding-block: var(--space-xl) var(--space-lg);
 }
 
-/* セクション背景の交互差し込み（視認性向上）。Sprint 2以降で活用 */
-.section:nth-of-type(even) {
+/* 背景の差し替えは nth-of-type ではなく明示クラスで指定する
+   （セクションを増減しても意図せず色が入れ替わらない）。 */
+.section--alt {
   background: var(--color-bg-subtle);
 }
 
-/* A2：セクション間リズムの整理（ごく控えめに）。
-   白⇄オフホワイトの境目を、既存ボーダー色のヘアラインだけで静かに区切る。
-   濃い線・色は使わず「面の切り替わり」をわずかに明確化するだけ。
-   nth-of-type(even) と隣接 even は連続しないため、各境界に1本ずつ入る。 */
-.section + .section {
-  border-top: 1px solid var(--color-border);
-}
-
-/* ---------- 5. ヘッダー / ナビ枠（機能は Sprint 6） ---------- */
+/* ---------- 5. ヘッダー / ナビ ---------- */
 .site-header {
   position: fixed; /* スクロールしても常に上部に固定 */
   inset: 0 0 auto 0;
   height: var(--header-height);
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: saturate(180%) blur(8px);
   border-bottom: 1px solid var(--color-border);
   z-index: 1000;
@@ -148,15 +163,23 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-sm);
 }
 
 .site-header__logo {
   /* ロゴは会社名（16文字）で長いため、狭い画面では自動縮小して
      ハンバーガーと重ならず1行に収まるようにする（320px端末まで対応）。 */
-  font-size: clamp(0.85rem, 4.4vw, 1.1rem);
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-family: var(--font-serif);
+  font-size: clamp(0.85rem, 4.2vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
   white-space: nowrap; /* ロゴの途中折り返しを禁止 */
+  color: var(--color-accent);
+}
+
+/* ヘッダー右のCTA（PCのみ表示。モバイルは画面下の固定バーが担当） */
+.site-header__cta {
+  display: none;
 }
 
 /* ハンバーガーボタン（モバイルで表示、PCで隠す） */
@@ -177,19 +200,15 @@ body {
   transition: var(--transition);
 }
 
-/* グローバルナビ（モバイル：初期は隠す。開閉は Sprint 6 で .is-open を付与） */
+/* グローバルナビ（モバイル：初期は隠す。開閉は JS が .is-open を付与） */
 .global-nav {
   position: fixed;
   inset: var(--header-height) 0 auto 0;
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-border);
   transform: translateY(-120%); /* 画面外へ退避 */
-  /* D2：閉じている間は visibility:hidden で「フォーカス不可」にする。
-     これまで画面外(translateY)でも DOM上はフォーカス可能で、キーボードで
-     見えないリンクに Tab 侵入できる欠陥があった。visibility:hidden は
-     配下の a もまとめてタブ順序から外す（display と違い transform の
-     スライドインを壊さない）。開く瞬間は即座に可視化したいので、
-     visibility のみ遅延なしで切り替える。 */
+  /* 閉じている間は visibility:hidden で「フォーカス不可」にする
+     （画面外のリンクにキーボードで Tab 侵入できてしまうのを防ぐ）。 */
   visibility: hidden;
   transition: transform var(--transition), visibility 0s linear var(--transition);
 }
@@ -197,7 +216,6 @@ body {
 .global-nav.is-open {
   transform: translateY(0);
   visibility: visible;
-  /* 開く時は visibility を遅延させない（即フォーカス可能に） */
   transition: transform var(--transition), visibility 0s;
 }
 
@@ -210,6 +228,7 @@ body {
   display: block;
   padding: var(--space-sm) var(--container-pad);
   border-top: 1px solid var(--color-border);
+  letter-spacing: 0.06em;
   transition: color var(--transition);
 }
 
@@ -217,9 +236,7 @@ body {
   color: var(--color-accent);
 }
 
-/* C1：スクロールスパイの現在地ハイライト（控えめに）。
-   JS が aria-current="page" を1つだけ付与する。色＝アクセント＋太字。
-   JS無効時はこのルールが一切効かない（aria-current が付かない）ので無害。 */
+/* スクロールスパイの現在地ハイライト（JSが aria-current を1つだけ付与） */
 .global-nav__list a[aria-current="page"] {
   color: var(--color-accent);
   font-weight: 700;
@@ -231,7 +248,11 @@ body {
 @media (min-width: 768px) {
   :root {
     --container-pad: 2rem;
-    --header-height: 72px;
+    --header-height: 76px;
+  }
+
+  body {
+    padding-bottom: 0; /* PCでは下部固定CTAを出さない */
   }
 
   /* PCではハンバーガーを隠し、ナビを横並びで常時表示 */
@@ -244,9 +265,8 @@ body {
     transform: none;
     background: transparent;
     border: none;
-    /* D2：768px以上はナビ常時表示。閉/開に関係なく必ずフォーカス可能に戻す
-       （モバイルの visibility:hidden 既定を打ち消す）。 */
-    visibility: visible;
+    margin-left: auto;
+    visibility: visible; /* モバイルの hidden 既定を打ち消す */
     transition: none;
   }
 
@@ -256,17 +276,35 @@ body {
   }
 
   .global-nav__list a {
-    padding: 0;
+    padding: 0 0 4px;
     border: none;
-    /* C1（PC）：現在地に下線を出すための土台。
-       下線分の高さを常に確保し、active 切替で行が動かないようにする。 */
-    padding-bottom: 4px;
+    font-size: 0.95rem;
+    /* 現在地の下線分の高さを常に確保し、active 切替で行が動かないようにする */
     border-bottom: 2px solid transparent;
   }
 
-  /* C1（PC）：現在地リンクの控えめな下線（アクセント色）。 */
   .global-nav__list a[aria-current="page"] {
     border-bottom-color: var(--color-accent);
+  }
+
+  /* PCのヘッダーCTA（参考LPの定番。相談導線を常時見せる） */
+  .site-header__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: var(--space-md);
+    padding: 0.55rem 1.2rem;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: background var(--transition);
+  }
+
+  .site-header__cta:hover {
+    background: var(--color-accent-dark);
   }
 }
 
@@ -279,12 +317,12 @@ body {
   }
   * {
     transition: none !important;
+    animation: none !important;
   }
 }
 
 /* ============================================================
    アクセシビリティ：キーボード操作時のフォーカス可視化
-   :focus ではなく :focus-visible を使い、マウス操作時には出さない
    ============================================================ */
 a:focus-visible,
 .btn:focus-visible,
@@ -296,9 +334,6 @@ a:focus-visible,
   border-radius: 2px;
 }
 
-/* main へプログラム的にフォーカスを移した際、太い枠を出さない
-   （スキップリンク着地時の視覚ノイズを避ける）。スクロール位置は
-   固定ヘッダーに潜らないよう scroll-margin-top で調整。 */
 #main-content {
   scroll-margin-top: var(--header-height);
 }
@@ -307,17 +342,13 @@ a:focus-visible,
 }
 
 /* ============================================================
-   D1：スキップリンク（visually-hidden → フォーカスで出現）
-   通常はサイズ 0 に畳んで視覚・レイアウトから除外（読み上げ順には残る）。
-   キーボードでフォーカスされた時だけ左上にアクセント色で出現させる王道。
+   スキップリンク（visually-hidden → フォーカスで出現）
    ============================================================ */
 .skip-link {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1100; /* 固定ヘッダー(z:1000)より前面に出す */
-  /* 通常は視覚から隠す（display:none は読み上げ・フォーカスを奪うので使わない）。
-     clip + サイズ0 の visually-hidden 方式。 */
   width: 1px;
   height: 1px;
   padding: 0;
@@ -331,7 +362,6 @@ a:focus-visible,
   border-radius: 0 0 var(--radius) 0;
 }
 
-/* フォーカス時：可視化して左上に表示。clip 解除で実寸へ。 */
 .skip-link:focus,
 .skip-link:focus-visible {
   width: auto;
@@ -340,20 +370,22 @@ a:focus-visible,
   clip: auto;
   clip-path: none;
   outline: 2px solid #fff;
-  outline-offset: -4px; /* アクセント背景の内側に白枠を出して視認性を上げる */
+  outline-offset: -4px;
 }
 
 /* ============================================================
-   ボタン（共通パーツ。ヒーロー以降の各CTAで使う）
+   ボタン（共通パーツ）
+   角丸を廃し、直線と余白で見せる（参考LPのトーン）
    ============================================================ */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px; /* タップ領域を確保（アクセシビリティ） */
-  padding: 0.7rem 1.6rem;
-  border-radius: 999px;
+  min-height: 52px; /* タップ領域を確保（アクセシビリティ） */
+  padding: 0.8rem 2rem;
+  border-radius: var(--radius);
   font-weight: 700;
+  letter-spacing: 0.08em;
   text-align: center;
   transition: background var(--transition), color var(--transition),
     border-color var(--transition), transform var(--transition);
@@ -373,7 +405,7 @@ a:focus-visible,
 }
 
 .btn--ghost {
-  border: 1.5px solid var(--color-accent);
+  border: 1px solid var(--color-accent);
   color: var(--color-accent);
 }
 
@@ -383,207 +415,310 @@ a:focus-visible,
 }
 
 /* ============================================================
-   Sprint 1：ヒーローセクション
-   モバイル：縦積み（テキスト→画像）／PC：2カラム（テキスト｜画像）
+   6. ヒーロー
+   モバイル：テキスト → 全幅写真の縦積み
+   PC：左テキスト｜右に写真を画面端まで見せる（参考LPの全幅ヒーロー）
    ============================================================ */
 .hero {
-  padding-block: var(--space-lg) var(--space-md);
-  background: linear-gradient(180deg, #f3f7fb 0%, var(--color-bg) 100%);
+  position: relative;
+  overflow: hidden; /* 背景の飾り文字がはみ出しても横スクロールさせない */
+  background: linear-gradient(180deg, #f6f5f2 0%, #ffffff 100%);
 }
 
 .hero__inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  /* A3：テキスト塊と画像の「間」を少し広げ、上品な余白に（装飾は増やさない）。 */
-  gap: calc(var(--space-md) + var(--space-xs));
-  align-items: center;
-  text-align: center;
+  gap: var(--space-md);
+  padding-block: var(--space-lg) 0;
+}
+
+.hero__body {
+  max-width: 34rem;
 }
 
 .hero__eyebrow {
+  font-family: var(--font-serif);
   color: var(--color-accent);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  /* 会社名（最上部の一行）を強調。見出し(h1)より小さく保ちつつ拡大。 */
-  font-size: clamp(1.1rem, 3.2vw, 1.6rem);
-  /* A3：肩書き（eyebrow）と大きな見出しの間に少しゆとりを持たせる。 */
-  margin-bottom: 0.75rem;
+  letter-spacing: 0.16em;
+  font-size: clamp(0.95rem, 3vw, 1.15rem);
+  margin-bottom: var(--space-sm);
+}
+
+/* 会社名の前に引く短いヘアライン（参考LPの記号的な区切り） */
+.hero__eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 2rem;
+  height: 1px;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+  background: var(--color-sage);
 }
 
 .hero__title {
-  /* キャッチコピーは3フレーズ・最長12字（「ものづくりに、伴走する。」）。
-     タブレットの2カラム時の狭い文字幅でも折れない上限に調整。 */
-  font-size: clamp(1.4rem, 4.5vw, 1.9rem);
-  line-height: 1.55;
-  letter-spacing: 0.01em;
+  /* キャッチコピーは3フレーズ・最長12字（「ものづくりに、伴走する。」） */
+  font-size: clamp(1.75rem, 7vw, 3rem);
+  line-height: 1.6;
+  letter-spacing: 0.06em;
+  color: var(--color-accent);
 }
 
-/* ヒーロー見出しのフレーズ単位折り返し（手動<br>を廃した堅牢方式）。
-   各フレーズを inline-block の塊にして、フレーズ内では改行させない
-   （語中改行・孤立を防止）。画面幅に応じてフレーズ間でのみ折り返す。
-   word-break: keep-all で和文の途中改行を念のため抑止。 */
+/* 見出しのフレーズ単位折り返し（手動<br>を使わない堅牢方式）。
+   各フレーズを inline-block の塊にして、フレーズ内では改行させない。 */
 .hero__title-phrase {
   display: inline-block;
   word-break: keep-all;
 }
 
 .hero__lead {
-  /* A3：見出し直下のリード文に少し「間」を持たせ、ゆったり読ませる。 */
-  margin-top: 1.25rem;
+  margin-top: var(--space-md);
   color: var(--color-text-muted);
-  max-width: 32rem;
+  font-size: 0.95rem;
+  max-width: 30rem;
+}
+
+/* 専門領域チップ（参考LPの「特長3点」チップ）。
+   本文・サービスに既出の内容だけを短く言い換えたもの。 */
+.hero__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: var(--space-md);
+}
+
+.hero__chip {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
-  justify-content: center;
   margin-top: var(--space-md);
 }
 
+/* 写真：モバイルは全幅（コンテナの左右余白を打ち消して端まで見せる） */
 .hero__visual {
-  width: 100%;
-  max-width: 420px;
+  position: relative;
+  margin-inline: calc(var(--container-pad) * -1);
+  margin-top: var(--space-md);
 }
 
 .hero__image {
   width: 100%;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: 50% 22%; /* 顔が中心に来るように上寄せで切り抜く */
+}
+
+/* 写真の上端を背景色へ溶かし、切り貼り感を消す（参考LPのグラデ処理） */
+.hero__visual::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 30%;
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+/* スクロール誘導（参考LPの定番。PCのみ、動きを減らす設定では静止） */
+.hero__scroll {
+  display: none;
 }
 
 @media (min-width: 992px) {
-  /* ヒーローの2カラム化は 992px 以上で。
-     768px台の2カラムだと文字列が窮屈になり、見出しが余計に折り返すため。 */
   .hero {
-    padding-block: var(--space-xl) var(--space-lg);
+    background: var(--color-bg);
   }
 
   .hero__inner {
-    flex-direction: row;
-    text-align: left;
-    gap: var(--space-lg);
+    /* 左テキスト｜右写真。写真は絶対配置で画面右端まで伸ばす。 */
+    min-height: 34rem;
+    padding-block: var(--space-xl) var(--space-xl);
+    justify-content: center;
   }
 
   .hero__body {
-    flex: 1 1 0;
-  }
-
-  .hero__actions {
-    justify-content: flex-start;
+    width: 52%;
+    max-width: 32rem;
   }
 
   .hero__visual {
-    flex: 0 0 42%;
-    max-width: 460px;
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 46vw;
+    max-width: 720px;
+    margin: 0;
+    z-index: -1; /* テキストの下に敷く（重なっても文字が勝つ） */
+  }
+
+  .hero__image {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-position: 50% 20%;
+  }
+
+  /* 写真の左端を白へ溶かし、テキストとの境目を作らない */
+  .hero__visual::after {
+    inset: 0;
+    height: auto;
+    background: linear-gradient(
+      90deg,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0.85) 22%,
+      rgba(255, 255, 255, 0) 55%
+    );
+  }
+
+  .hero__scroll {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    position: absolute;
+    left: var(--container-pad);
+    bottom: var(--space-md);
+    z-index: 1;
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  /* 下へ伸びる線（ゆっくり伸縮して視線を誘導） */
+  .hero__scroll::after {
+    content: "";
+    width: 48px;
+    height: 1px;
+    background: var(--color-sage);
+    transform-origin: left center;
+    animation: scroll-line 2.4s ease-in-out infinite;
   }
 }
 
+@keyframes scroll-line {
+  0%, 100% { transform: scaleX(0.3); opacity: 0.5; }
+  50%      { transform: scaleX(1);   opacity: 1; }
+}
+
 /* ============================================================
-   共通：セクション見出し（Sprint 2 で導入、以降のセクションで共用）
+   7. 共通：セクション見出し
+   参考LPの「巨大な英字ウォーターマーク＋日本語見出し」を再現。
+   英字（.section-head__eyebrow）を背後の飾りに回し、
+   日本語見出しを主役として前面に置く。
    ============================================================ */
 .section-head {
+  position: relative;
   text-align: center;
   margin-bottom: var(--space-lg);
+  padding-top: var(--space-md);
+  /* ウォーターマークが画面外へはみ出しても横スクロールさせない */
+  overflow: hidden;
 }
 
 .section-head__eyebrow {
-  color: var(--color-accent);
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: none;
+  font-family: var(--font-serif);
+  font-size: clamp(2.6rem, 11vw, 5rem);
+  line-height: 1;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  font-size: 0.8rem;
+  white-space: nowrap;
+  color: rgba(143, 162, 163, 0.22); /* くすみグリーンの淡い飾り文字 */
+  pointer-events: none;
+  user-select: none;
 }
 
 .section-head__title {
-  font-size: clamp(1.5rem, 5vw, 2rem);
-  margin-top: var(--space-xs);
   position: relative;
+  z-index: 1;
   display: inline-block;
-  padding-bottom: var(--space-xs);
+  font-size: clamp(1.5rem, 5.5vw, 2.1rem);
+  color: var(--color-accent);
+  padding-bottom: var(--space-sm);
 }
 
-/* 見出し下のアクセント下線 */
+/* 見出し下の細い区切り線（太いアクセント下線はやめ、上品な1本線に） */
 .section-head__title::after {
   content: "";
   position: absolute;
   left: 50%;
   bottom: 0;
   transform: translateX(-50%);
-  width: 48px;
-  height: 3px;
-  border-radius: 3px;
-  background: var(--color-accent);
+  width: 40px;
+  height: 1px;
+  background: var(--color-sage);
 }
 
 /* ============================================================
-   B1：実績の「数字」ストリップ（stat band）
-   About セクション冒頭に置く、定量的事実の訴求パーツ。
-   既存トークン（accent / muted / border / space / radius）だけで構成し、
-   新トークンは増やさない。落ち着いた B2B トーンのため装飾は最小限。
-   モバイル：2列グリッド／タブレット以上：4列の横一列。
+   8-1. 実績の「数字」ストリップ（stat band）
+   カード＋影をやめ、上下のヘアラインと余白だけで見せる。
+   数字は明朝で大きく（参考LPの数字表現）。
    ============================================================ */
 .stat-band {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* モバイルは2×2 */
-  gap: var(--space-sm);
-  margin: 0 0 var(--space-lg);
-  padding: var(--space-md) var(--space-sm);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  gap: var(--space-md) var(--space-sm);
+  margin: 0 0 var(--space-xl);
+  padding-block: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
   text-align: center;
 }
 
 .stat-band__item {
-  /* dl 直下の div。区切りは控えめなヘアラインで（縦罫）。 */
-  padding: var(--space-xs) var(--space-xs);
+  padding-inline: var(--space-xs);
 }
 
-/* 数字＝主役。アクセント色＋大きめ。dt だが視覚は「値」。 */
 .stat-band__value {
   display: block;
+  font-family: var(--font-serif);
   color: var(--color-accent);
-  font-weight: 700;
-  font-size: clamp(1.8rem, 7vw, 2.4rem);
+  font-weight: 600;
+  font-size: clamp(2rem, 8vw, 2.6rem);
   line-height: 1.1;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 
-/* 単位（年・年〜 など）は数字より小さく添える。 */
 .stat-band__unit {
-  font-size: 0.5em;
-  font-weight: 700;
-  margin-left: 0.15em;
-  color: var(--color-accent);
+  font-size: 0.45em;
+  margin-left: 0.2em;
+  letter-spacing: 0.08em;
 }
 
-/* ラベル＝補足。muted＋小。dd の既定マージンを消す。 */
 .stat-band__label {
-  margin: 0.4rem 0 0;
-  font-size: 0.8rem;
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
   color: var(--color-text-muted);
-  line-height: 1.5;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
 }
 
 @media (min-width: 768px) {
   .stat-band {
     grid-template-columns: repeat(4, 1fr); /* タブレット以上は横一列 */
-    padding: var(--space-md);
   }
 
-  /* 項目間に控えめな縦の区切り線（最初の項目以外の左に1本）。
-     色は既存 border。装飾過多を避けるため細線のみ。 */
   .stat-band__item + .stat-band__item {
     border-left: 1px solid var(--color-border);
   }
 }
 
 /* ============================================================
-   Sprint 2：プロフィール（About）
-   モバイル：写真→本文の縦積み／PC：写真｜本文の横並び
+   8-2. プロフィール（About）
    ============================================================ */
 .about__inner {
   display: flex;
@@ -596,6 +731,17 @@ a:focus-visible,
   margin: 0;
   width: 200px;
   flex-shrink: 0;
+  position: relative;
+}
+
+/* 顔写真を囲む細いリング（額装）。写真と同心円なのでずれない。装飾のみ。 */
+.about__figure::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border: 1px solid var(--color-sage);
+  border-radius: 50%;
+  opacity: 0.6;
 }
 
 .about__image {
@@ -603,23 +749,28 @@ a:focus-visible,
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 50%; /* 丸型の顔写真 */
-  box-shadow: var(--shadow);
 }
 
 .about__name {
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   margin-bottom: var(--space-sm);
+  color: var(--color-accent);
 }
 
 .about__role {
-  font-size: 0.95rem;
+  font-family: var(--font-base);
+  font-size: 0.9rem;
   font-weight: 500;
+  letter-spacing: 0.04em;
   color: var(--color-text-muted);
 }
 
 .about__text {
   margin-bottom: var(--space-sm);
+  font-size: 0.95rem;
 }
 
 .about__facts {
@@ -630,18 +781,21 @@ a:focus-visible,
 .about__fact {
   display: flex;
   gap: var(--space-sm);
-  padding: 0.7rem 0;
+  padding: 0.9rem 0;
   border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
 }
 
 .about__fact dt {
   flex: 0 0 6.5rem;
   font-weight: 700;
+  letter-spacing: 0.08em;
   color: var(--color-accent);
 }
 
 .about__fact dd {
   margin: 0;
+  color: var(--color-text-muted);
 }
 
 @media (min-width: 768px) {
@@ -663,71 +817,179 @@ a:focus-visible,
 }
 
 /* ============================================================
-   Sprint 3：サービス / 事業内容
-   レスポンシブグリッド：auto-fit + minmax で列数が自動調整される
-   （220px を下回らない範囲で 1〜3 列に折り返す。breakpoint不要）
+   8-3. 帯セクション（quote band）
+   参考LPの「濃い面で白抜きの一言」＝縦のリズムを作る休符。
+   文言はヒーローのキャッチコピーと同じ（新しい主張は足さない）。
+   ============================================================ */
+.band {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-band);
+  color: #fff;
+  padding-block: var(--space-lg);
+  text-align: center;
+}
+
+.band__text {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-serif);
+  font-size: clamp(1.2rem, 4.6vw, 1.9rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.9;
+}
+
+.band__sub {
+  position: relative;
+  z-index: 1;
+  margin-top: var(--space-sm);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  /* 濃紺(#1f3a52)の上で約7.5:1。十分に読める明るさ。 */
+  color: #c3cdd6;
+}
+
+/* 背後の飾り文字（参考LPのウォーターマーク）。
+   「MONOZUKURI」10文字が letter-spacing 込みで約8.4em になるため、
+   1文字あたり約 11vw までなら全幅(100vw)に収まる。上限 7rem も
+   帯の最小想定幅(約940px)で同様に収まる値。＝どの幅でも途切れない。 */
+.band__watermark {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-serif);
+  font-size: min(11vw, 7rem);
+  line-height: 1;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ============================================================
+   8-4. サービス
+   参考LPの「番号＋角括弧」ボックス。影を消し、線と余白で見せる。
    ============================================================ */
 .service-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: var(--space-md);
 }
 
 .service-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: var(--space-md);
+  padding: var(--space-md) var(--space-md) calc(var(--space-md) + 0.5rem);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  transition: transform var(--transition), box-shadow var(--transition);
+  transition: transform var(--transition), border-color var(--transition);
+}
+
+/* 左上・右下の角括弧（装飾）。ホバーでアクセント色に締まる。 */
+.service-card::before,
+.service-card::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--color-sage);
+  transition: border-color var(--transition);
+}
+
+.service-card::before {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.service-card::after {
+  right: 8px;
+  bottom: 8px;
+  border-left: none;
+  border-top: none;
 }
 
 .service-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+  border-color: var(--color-sage);
 }
 
-/* アイコンを丸いアクセント背景に乗せる */
+.service-card:hover::before,
+.service-card:hover::after {
+  border-color: var(--color-accent);
+}
+
+/* 通し番号（01/02/03）。参考LPのゴースト数字を控えめに再現。 */
+.service-card__num {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  color: var(--color-sage);
+  margin-bottom: var(--space-sm);
+}
+
 .service-card__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: rgba(43, 108, 176, 0.1); /* accent の薄い色 */
+  width: 48px;
+  height: 48px;
   color: var(--color-accent);
   margin-bottom: var(--space-sm);
 }
 
 .service-card__title {
   font-size: 1.15rem;
-  margin-bottom: var(--space-xs);
+  color: var(--color-accent);
+  margin-bottom: var(--space-sm);
 }
 
 .service-card__desc {
   color: var(--color-text-muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 /* ============================================================
-   Sprint 4：経歴・実績
+   8-5. 経歴・実績
    ============================================================ */
 .works__subtitle {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.14em;
+  text-align: center;
   margin-bottom: var(--space-md);
-  padding-left: 0.75rem;
-  border-left: 4px solid var(--color-accent); /* 小見出しの左アクセント */
+  color: var(--color-accent);
 }
+
+/* 小見出しの左右に伸びる細線（中央寄せの上品な区切り） */
+.works__subtitle span {
+  position: relative;
+  display: inline-block;
+  padding-inline: 1.2rem;
+}
+
+.works__subtitle span::before,
+.works__subtitle span::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 1.5rem;
+  height: 1px;
+  background: var(--color-sage);
+}
+
+.works__subtitle span::before { left: -1rem; }
+.works__subtitle span::after  { right: -1rem; }
 
 .works__subtitle--timeline {
-  margin-top: var(--space-lg);
+  margin-top: var(--space-xl);
 }
 
-/* 実績グリッド（サービスと同様に auto-fit で 1〜3 列） */
 .works-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -737,15 +999,13 @@ a:focus-visible,
 .work-card {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  overflow: hidden; /* 画像の角を radius に合わせる */
-  box-shadow: var(--shadow);
-  transition: transform var(--transition), box-shadow var(--transition);
+  overflow: hidden;
+  transition: transform var(--transition), border-color var(--transition);
 }
 
 .work-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+  border-color: var(--color-sage);
 }
 
 .work-card__image {
@@ -755,12 +1015,7 @@ a:focus-visible,
   display: block;
 }
 
-/* B2：縦長の紙面（新聞掲載）を切らずに全体を見せる版。
-   - object-fit:contain で上下を切らず全体を表示（cover の切れを解消）。
-   - aspect-ratio を 3/4 へ（紙面は縦長なので、枠も縦長にして余白を最小化）。
-   - 余白部はオフホワイトの無地背景にして、紙面を上品に引き立てる。
-   横長の NHK カード（4:3 cover）と並んでも、各カードは個別に高さを取り
-   破綻しない（works-grid は各セルが内容に追従するため）。 */
+/* 縦長の紙面（新聞掲載）は切らずに全体を見せる（3:4・contain・無地背景） */
 .work-card__image--contain {
   aspect-ratio: 3 / 4;
   object-fit: contain;
@@ -773,29 +1028,29 @@ a:focus-visible,
 
 .work-card__title {
   font-size: 1.05rem;
+  color: var(--color-accent);
   margin-bottom: var(--space-xs);
 }
 
 .work-card__desc {
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-/* 経歴タイムライン：左に縦線、各項目に年バッジ */
+/* 経歴タイムライン：左に縦線、年は明朝で大きめに */
 .timeline {
   position: relative;
   margin: 0;
-  padding-left: 1.5rem;
+  padding-left: 1.75rem;
 }
 
-/* 縦のライン */
 .timeline::before {
   content: "";
   position: absolute;
-  left: 5px;
-  top: 6px;
-  bottom: 6px;
-  width: 2px;
+  left: 4px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
   background: var(--color-border);
 }
 
@@ -808,77 +1063,79 @@ a:focus-visible,
   padding-bottom: 0;
 }
 
-/* ライン上のドット */
+/* ライン上の小さな菱形（丸ドットより硬質で製造業らしい） */
 .timeline__item::before {
   content: "";
   position: absolute;
-  left: -1.5rem;
-  top: 6px;
-  width: 12px;
-  height: 12px;
-  margin-left: 0;
-  border-radius: 50%;
+  left: -1.75rem;
+  top: 12px;
+  width: 9px;
+  height: 9px;
   background: var(--color-accent);
-  box-shadow: 0 0 0 4px rgba(43, 108, 176, 0.15);
+  transform: rotate(45deg);
 }
 
 .timeline__year {
   display: inline-block;
-  font-weight: 700;
-  color: var(--color-accent);
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--color-sage);
   margin-bottom: 0.2rem;
 }
 
 .timeline__title {
   font-size: 1.05rem;
-  margin-bottom: 0.2rem;
+  color: var(--color-accent);
+  margin-bottom: 0.3rem;
 }
 
 .timeline__desc {
   color: var(--color-text-muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 @media (min-width: 768px) {
-  /* PCではタイムラインを中央寄せして読みやすい幅に */
   .timeline {
     max-width: 640px;
+    margin-inline: auto;
   }
 }
 
 /* ============================================================
-   Sprint 5：お問い合わせ
+   8-6. お問い合わせ
    ============================================================ */
 .contact__card {
-  max-width: 560px;
+  max-width: 620px;
   margin-inline: auto;
   text-align: center;
   padding: var(--space-lg) var(--space-md);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
 }
 
 .contact__text {
   margin-bottom: var(--space-md);
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
 }
 
-/* メールボタン内のアイコンと文字の間隔 */
 .contact__mail {
   gap: 0.5rem;
 }
 
 .contact__address {
   margin-top: var(--space-md);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
   word-break: break-all; /* 長いアドレスでも狭い画面で溢れない */
 }
 
 .contact__address a {
   color: var(--color-accent);
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid var(--color-border);
   transition: border-color var(--transition);
 }
 
@@ -886,13 +1143,10 @@ a:focus-visible,
   border-bottom-color: var(--color-accent);
 }
 
-/* ----- コピー導線（mailto が機能しない環境向けの保険） -----
-   既定のメールアプリ未設定のPCでは mailto ボタンが無反応のため、
-   表示中アドレスをクリップボードへコピーするボタンを併設する。
-   既定は非表示で、JSが動いた時（html.js）だけ表示する＝JS無効時は
-   従来表示と完全に同じ。見た目は既存トークンだけの控えめなセカンダリ調。 */
+/* コピー導線（既定メーラー未設定のPC向けの保険）。
+   JSが動いた時（html.js）だけ表示＝JS無効時は従来表示と同じ。 */
 .copy-btn {
-  display: none; /* JS無効時は出さない（.js ゲートで解除） */
+  display: none;
 }
 
 .js .copy-btn {
@@ -901,12 +1155,11 @@ a:focus-visible,
   gap: 0.35rem;
   margin-left: 0.6rem;
   padding: 0.3rem 0.85rem;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-text-muted);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: 999px;
   vertical-align: middle;
   word-break: normal; /* 親(.contact__address)の break-all を打ち消す */
   transition: color var(--transition), border-color var(--transition);
@@ -917,9 +1170,6 @@ a:focus-visible,
   border-color: var(--color-accent);
 }
 
-/* コピー結果の通知（成功＝アクセント色／失敗＝読める濃さの赤）。
-   空の時も min-height で1行分を確保し、表示時のレイアウトシフトを防ぐ。
-   コンテナ自体も .js ゲート（JS無効時は空のままなので畳んで非表示）。 */
 .copy-status {
   display: none;
 }
@@ -934,15 +1184,42 @@ a:focus-visible,
 }
 
 .js .copy-status--error {
-  color: #b42318; /* 白背景で 5.9:1 を確保（4.5:1 以上） */
+  color: #b42318; /* 白背景で 5.9:1 */
 }
 
 /* ============================================================
-   Sprint 5：フッター
+   8-7. モバイル固定CTAバー（参考LPの定番導線）
+   画面下に常時「メールで相談」を置く。768px以上では出さない。
+   ============================================================ */
+.mobile-cta {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 900;
+  display: flex;
+  padding: 0.6rem var(--container-pad);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-top: 1px solid var(--color-border);
+}
+
+.mobile-cta .btn {
+  width: 100%;
+  min-height: 48px;
+  font-size: 0.95rem;
+}
+
+@media (min-width: 768px) {
+  .mobile-cta {
+    display: none;
+  }
+}
+
+/* ============================================================
+   9. フッター
    ============================================================ */
 .site-footer {
-  background: #1f2733;
-  color: #cdd3dc;
+  background: #16293a;
+  color: #c3cdd6;
   padding-block: var(--space-lg);
   text-align: center;
 }
@@ -955,23 +1232,27 @@ a:focus-visible,
 }
 
 .site-footer__logo {
+  font-family: var(--font-serif);
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   color: #fff;
 }
 
 .site-footer__tagline {
-  font-size: 0.85rem;
-  color: #9aa3b2;
-  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: #a9b4bf; /* #16293a 上で約6.5:1 */
+  margin-top: 0.4rem;
 }
 
 .site-footer__top {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.85rem;
-  color: #cdd3dc;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: #c3cdd6;
   transition: color var(--transition);
 }
 
@@ -980,13 +1261,13 @@ a:focus-visible,
 }
 
 .site-footer__copy {
-  font-size: 0.8rem;
-  /* ダーク背景(#1f2733)に対しコントラスト比 4.5:1 以上を確保（約5.2:1） */
-  color: #8f99a8;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: #93a0ad; /* #16293a 上で約5.3:1（4.5:1 以上を確保） */
 }
 
 /* ============================================================
-   Sprint 6：ナビ機能・スクロール出現アニメ
+   10. アニメーション（ナビ開閉・スクロール出現）
    ============================================================ */
 
 /* ハンバーガー → ×（開いているときは aria-expanded="true"） */
@@ -1001,7 +1282,7 @@ a:focus-visible,
 }
 
 /* スクロール出現：JS有効(.js)かつ動きを減らさない(.reduce以外)ときだけ隠す。
-   → JSが無効/失敗したり、reduced-motion設定なら最初から表示される（読める）。 */
+   → JS無効/失敗や reduced-motion なら最初から表示される（読める）。 */
 .js:not(.reduce) .section-head,
 .js:not(.reduce) .service-card,
 .js:not(.reduce) .work-card,
@@ -1011,49 +1292,46 @@ a:focus-visible,
 .js:not(.reduce) .contact__card {
   opacity: 0;
   transform: translateY(18px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition: opacity 0.7s ease, transform 0.7s ease;
   will-change: opacity, transform;
 }
 
-/* IntersectionObserver が付与する .is-visible で表示状態へ */
 .js:not(.reduce) .is-visible {
   opacity: 1;
   transform: none;
 }
 
 /* ============================================================
-   G2：印刷スタイル（@media print）
-   名刺サイトは「印刷して手渡す」用途がある。紙面では：
-   - 画面専用UI（固定ヘッダー/ハンバーガー/スキップリンク/トップ戻る/装飾アニメ）を隠す
-   - 背景グラデ・濃色面・影を抑え、黒文字＋白背景主体に
-   - 出現アニメで隠れている要素を確実に表示（opacity:1 / transform:none）
-   - カード・セクションが不自然に分断されない配慮（break-inside: avoid）
-   - 連絡先（メールアドレス）が紙面で読めるように
-   実用本位で、過度な作り込みはしない。
+   11. 印刷スタイル（@media print）
+   名刺サイトは「印刷して手渡す」用途がある。紙では画面専用UIを隠し、
+   黒文字＋白背景主体にする。
    ============================================================ */
 @media print {
-  /* 全体：黒文字＋白背景、影・装飾を排除して印刷向きに */
   html,
   body {
     background: #fff !important;
     color: #000 !important;
-    padding-top: 0 !important; /* 固定ヘッダー分の余白は不要 */
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
 
-  /* 画面専用UIを隠す（紙では機能しない/邪魔になる）
-     コピーボタン・通知領域も紙では無意味なので隠す（アドレス本体は残る） */
+  /* 画面専用UIを隠す */
   .site-header,
   .nav-toggle,
   .global-nav,
   .skip-link,
   .site-footer__top,
   .hero__actions,
+  .hero__scroll,
+  .mobile-cta,
   .copy-btn,
-  .copy-status {
+  .copy-status,
+  .section-head__eyebrow,
+  .band__watermark {
     display: none !important;
   }
 
-  /* 出現アニメで隠れている要素も確実に表示（JS有効時の opacity:0 を打ち消す） */
+  /* 出現アニメで隠れている要素も確実に表示 */
   .section-head,
   .service-card,
   .work-card,
@@ -1066,14 +1344,29 @@ a:focus-visible,
     transform: none !important;
   }
 
-  /* 背景グラデ・濃色面・影を抑える（インク節約＋可読性） */
+  /* 背景の濃色面・グラデを抑える（インク節約＋可読性） */
   .hero {
     background: #fff !important;
-    padding-block: var(--space-md) !important;
   }
 
-  .section:nth-of-type(even) {
+  .hero__visual {
+    position: static !important;
+    width: auto !important;
+    z-index: auto !important;
+  }
+
+  .section--alt {
     background: #fff !important;
+  }
+
+  .band {
+    background: #fff !important;
+    color: #000 !important;
+    border-block: 1px solid #999 !important;
+  }
+
+  .band__sub {
+    color: #222 !important;
   }
 
   .stat-band,
@@ -1082,21 +1375,14 @@ a:focus-visible,
   .contact__card {
     box-shadow: none !important;
     border: 1px solid #999 !important;
-    /* カードが途中でページ分割されないように */
-    break-inside: avoid;
-    page-break-inside: avoid; /* 旧仕様の保険 */
-  }
-
-  /* セクション見出し・タイムライン項目も分断回避 */
-  .section-head,
-  .timeline__item {
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
-  /* セクション境界のヘアラインは残し、面の切替を黒で示す */
-  .section + .section {
-    border-top: 1px solid #ccc !important;
+  .section-head,
+  .timeline__item {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   /* フッターのダーク面 → 白地に黒文字へ反転 */
@@ -1112,21 +1398,20 @@ a:focus-visible,
     color: #000 !important;
   }
 
-  /* アクセント色テキストは印刷でも残すが、薄くなりすぎないよう本文は黒に寄せる。
-     muted テキストは紙だと薄すぎるため、しっかり読める濃さへ。 */
+  /* muted テキストは紙だと薄すぎるため、しっかり読める濃さへ */
   .about__text,
+  .about__fact dd,
   .service-card__desc,
   .work-card__desc,
   .timeline__desc,
   .hero__lead,
-  .stat-band__label {
+  .hero__chip,
+  .stat-band__label,
+  .contact__text {
     color: #222 !important;
   }
 
-  /* 連絡先（メール）が紙面で確実に読めるように：黒文字で明示。
-     mailto ボタンはクリックできないが、住所(アドレス)行は必読情報として残す。 */
   .contact__mail {
-    /* ボタンは枠線付きの黒文字に（背景塗りはインクを食うので白地へ） */
     background: #fff !important;
     color: #000 !important;
     border: 1px solid #000 !important;
@@ -1137,7 +1422,6 @@ a:focus-visible,
     border-bottom: none !important;
   }
 
-  /* リンクは色だけだと判別しづらいので、本文リンクは黒文字に統一 */
   a {
     color: #000 !important;
   }
