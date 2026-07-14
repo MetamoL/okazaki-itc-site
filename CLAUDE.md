@@ -42,7 +42,8 @@ HTML / CSS / JS のみ。AWS S3 + CloudFront などの静的ホスティング�
   - B: 数字ストリップ(30年以上/12年/2010年〜/2013年)／新聞カードの contain 全面表示／CTA文言＋mailto件名・本文プリセット
   - C: スキップリンク／モバイルメニューのフォーカス管理(閉時フォーカス不可化＋復帰)／`404.html`／印刷スタイル
   - D: JSON-LD(Person+Organization)／ヒーローLCP最適化(preload＋fetchpriority)。WebPは環境にエンコーダ無く見送り(壊れ参照なし)
-- **公開URL（正）**：**https://okazakiit.github.io/okazaki-itc-site/**（GitHub Pages・Public・`main`/root配信・`.nojekyll`・HTTPS強制。`git push`で自動再デプロイ）
+- **公開URL（正）**：<https://okazakiit.github.io/okazaki-itc-site/> （GitHub Pages・Public・`main`/root配信・`.nojekyll`・HTTPS強制。`git push`で自動再デプロイ）
+  - 📝 URL を `**` で囲むと末尾の `**` までリンクに食われて 404 になる。太字にせず `<...>` で囲むこと。
   - ⚠️ 旧URL `metamol.github.io/okazaki-itc-site/` は**譲渡で消滅済み（404・リダイレクトなし）**。ドキュメントやリンクに書かない。
 - **協働体制（譲渡完了・2026-06-10）**：リポジトリは **`OkazakiIT/okazaki-itc-site`（岡﨑さん所有）**。MetamoL は共同編集者(write)。両者 `push` で保守可。ローカル remote も切替済み。
   - MetamoL の「Repositories」タブには**出ない**（所有者が別のため）。閲覧は上記URLか https://github.com/OkazakiIT/okazaki-itc-site から。
