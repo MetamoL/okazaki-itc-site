@@ -4,7 +4,7 @@
 
 - **公開URL**: <https://okazakiit.github.io/okazaki-itc-site/>（GitHub Pages・`main` への push で自動公開）
 - 状態: デザイン刷新（2026-07-14・クライアント承認済み）まで完了し、現在は**保守フェーズ（残タスクなし）**。作業の経緯は git 履歴を参照。
-- 関連ドキュメント: 開発の約束事＝`CLAUDE.md` ／ デプロイ手順・公開前チェック＝`DEPLOY.md` ／ Google 検索への登録＝`SEARCH_CONSOLE.md`
+- 関連ドキュメント: 開発の入口＝`AGENTS.md` ／ デプロイ手順・公開前チェック＝`DEPLOY.md` ／ Google 検索への登録＝`SEARCH_CONSOLE.md`
 
 ## ディレクトリ構成
 

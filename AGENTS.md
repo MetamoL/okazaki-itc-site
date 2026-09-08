@@ -1,14 +1,8 @@
-# AGENTS.md — Codex作業入口
+<!-- codex-environment: 2026-09 -->
+# 名刺サイト
 
-このリポジトリで作業する前に、まず `CLAUDE.md` を読み、公開や配信に関わる変更では `DEPLOY.md` も読む。構成の確認が必要なら `README.md` を参照する。
+受託した事業紹介の静的サイト。`index.html`・`404.html`、`css/style.css`、`js/main.js` が主な編集先。ビルド不要。依頼主の素材原本は `client_source/`、公開範囲は `README.md`、公開前条件は `DEPLOY.md`。
 
-## 事故防止
+素材原本を公開repoへ追加せず、確認済みの名称・事業内容・連絡先を推測で変更しない。検索確認タグは `SEARCH_CONSOLE.md` に対応するため削除しない。個人情報を環境指示へ複製しない。
 
-- `main` への push は GitHub Pages の本番公開に直結する。`git push`・公開操作はオーナーの明示承認後にだけ行う。検証後の `git commit` は実施してよい。
-- `client_source/` は非公開の原本置き場で、公開リポジトリに追加・ステージしない。一度 push した個人情報は履歴から消せない。
-- `index.html` の Google Search Console 所有権確認タグは削除しない。手順は `SEARCH_CONSOLE.md` を読む。
-- 変更前に `git status --short` で既存変更を確認し、他者の変更を戻さない。
-
-## 確認
-
-ビルドは不要。`index.html` をブラウザで開き、変更に応じて 375 / 768 / 1024px（公開前は `DEPLOY.md` 記載の幅）で表示とコンソールを確認する。
+対象ページをブラウザで表示し、375/768/1024px付近のレイアウト、ナビ、リンク、フォーカスを変更に応じて確認する。JavaScriptは `node --check js/main.js` でも構文確認できる。mainへのpushはGitHub Pagesへの公開に直結する。
